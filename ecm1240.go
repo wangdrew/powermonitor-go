@@ -78,7 +78,9 @@ func (me *ECM1240Source) Read() (models.PowerMetrics, error) {
 			VoltageV:   v,
 		}
 	}
-	if me.previousMetrics != nil {
+	// skip outputting this metric if this is the first metric, or if the ecm1240's clock has
+	// overflowed its limit of 16777216
+	if me.previousMetrics != nil && clk-me.previousDeviceClock > 0.0 {
 		for k, v := range currMetrics {
 			v.PowerW = (v.EnergyWs - me.previousMetrics[k].EnergyWs) / (clk - me.previousDeviceClock)
 		}

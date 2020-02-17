@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/wangdrew/powermonitor-go/models"
 	"log"
 	"os"
@@ -11,13 +10,23 @@ import (
 
 func main() {
 	ctx := context.Background()
+	influxURL := ""
+	influxToken := ""
+	influxBucket := ""
+	influxOrg := ""
+
 	serialPath := os.Getenv("SERIAL_PATH")
 	if serialPath == "" {
 		serialPath = "/dev/ttyUSB0"
 	}
 
 	timer := NewTickerTimer(2000 * time.Millisecond)
-	output := make(chan models.PowerMetrics, 100)
+	metrics := make(chan models.PowerMetrics, 100)
+	stopOutput := make(chan struct{})
+	output, err := NewInflux(influxURL, influxToken, influxOrg, influxBucket)
+	if err != nil {
+		log.Fatal(err)
+	}
 	source := NewECM1240Source("power", serialPath)
 	if err := source.Init(); err != nil {
 		log.Fatal(err)
@@ -25,13 +34,12 @@ func main() {
 	go func() {
 		<-ctx.Done()
 		close(timer.Stop())
+		close(stopOutput)
 	}()
 
 	go func() {
-		for {
-			fmt.Println(<-output)
-		}
+		output.Start(metrics, stopOutput)
 	}()
 
-	NewRunner(source, timer, output).Run()
+	NewRunner(source, timer, metrics).Run()
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/wangdrew/powermonitor-go/models"
-	"runtime"
 	"testing"
 	"time"
 )
@@ -33,7 +32,7 @@ func TestRunner_Run(t *testing.T) {
 	for i := 0; i < n; i++ {
 		timer.Trig <- time.Now()
 	}
-	runtime.Gosched() // allow Run to output before closing the channel
+	time.Sleep(100 * time.Millisecond) // allow Run to output before closing the channel
 	close(output)
 
 	assert.Equal(t, 10, source.NumReadCalls)
