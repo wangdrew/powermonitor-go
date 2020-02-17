@@ -14,10 +14,6 @@ type Source interface {
 	Read() (models.PowerMetrics, error)
 }
 
-type SerialDevice interface {
-	Read([]byte) (int, error)
-}
-
 func NewECM1240Source(deviceName, serialPath string) Source {
 	return &ECM1240Source{Name: deviceName, serialPath: serialPath}
 }
@@ -28,6 +24,10 @@ type ECM1240Source struct {
 	serialPath          string
 	previousMetrics     map[string]*models.PowerMetric
 	previousDeviceClock float32
+}
+
+type SerialDevice interface {
+	Read([]byte) (int, error)
 }
 
 func (me *ECM1240Source) Init() error {
@@ -46,7 +46,6 @@ func (me *ECM1240Source) Init() error {
 	return nil
 }
 
-// todo: trigger channel
 func (me *ECM1240Source) Read() (models.PowerMetrics, error) {
 	if me.Port == nil {
 		return nil, fmt.Errorf("error reading metrics, did you forget to call init()")
@@ -104,7 +103,6 @@ func trim(data []byte) []byte {
 	return []byte{}
 }
 
-
 func flatten(in map[string]*models.PowerMetric) models.PowerMetrics {
 	ret := make(models.PowerMetrics, len(in))
 	i := 0
@@ -130,7 +128,7 @@ var wattSecParsers = map[string]parsers{
 /**
 Parsers specific to the Brultech ECM1240 data format
 https://www.brultech.com/software/files/downloadSoft/ECM1240_Packet_format_ver9.pdf
- */
+*/
 
 // AC voltage volts
 func voltage(dataframe []byte) (float32, error) {
