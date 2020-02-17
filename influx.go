@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/influxdata/influxdb-client-go"
 	"github.com/wangdrew/powermonitor-go/models"
+	"log"
 )
 
 type Output interface {
@@ -27,15 +27,13 @@ func (me *InfluxOutput) Start(metrics chan models.PowerMetrics, stop chan struct
 		select {
 		case <-stop:
 			if err := me.Client.Close(); err != nil {
-				fmt.Errorf("%+v", err)
+				log.Printf("error closing output client: %+v", err)
 			}
 			return
 		case m := <-metrics:
 			_, err := me.Client.Write(context.Background(), me.bucket, me.org, mapMetrics(m)...)
 			if err != nil {
-				fmt.Println(err)
-				// fixme does this work?
-				fmt.Errorf("%+v", err) // continue on error
+				log.Printf("error writting metric: %+v", err)
 			}
 		}
 	}

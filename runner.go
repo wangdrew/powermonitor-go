@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/wangdrew/powermonitor-go/models"
+	"log"
 	"time"
 )
 
@@ -30,9 +30,16 @@ func (me *Runner) Run() {
 		case <-me.Timer.Trigger():
 			metrics, err := me.Source.Read()
 			if err != nil {
-				fmt.Errorf("%+v", err) // only log on errors
+				log.Printf("error reading metric from source: %+v", err)
 			}
-			me.Output <- metrics
+			if len(metrics) == 0 {
+				continue // metrics are empty
+			}
+			select {
+			case me.Output <- metrics:
+			default:
+				log.Println("output channel is full, skipping metric")
+			}
 		}
 	}
 }
