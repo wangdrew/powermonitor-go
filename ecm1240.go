@@ -23,7 +23,7 @@ type ECM1240Source struct {
 	Port                SerialDevice
 	serialPath          string
 	previousMetrics     map[string]*models.PowerMetric
-	previousDeviceClock float32
+	previousDeviceClock float64
 }
 
 type SerialDevice interface {
@@ -115,7 +115,7 @@ func flatten(in map[string]*models.PowerMetric) models.PowerMetrics {
 	return ret
 }
 
-type parsers func([]byte) (float32, error)
+type parsers func([]byte) (float64, error)
 
 var wattSecParsers = map[string]parsers{
 	"1": wattSec1,
@@ -133,84 +133,84 @@ https://www.brultech.com/software/files/downloadSoft/ECM1240_Packet_format_ver9.
 */
 
 // AC voltage volts
-func voltage(dataframe []byte) (float32, error) {
+func voltage(dataframe []byte) (float64, error) {
 	//fmt.Printf("v: ")
 	return readAsFloat(dataframe, 3, 5, 0.1, false)
 }
 
 // watt seconds for ch1
-func wattSec1(dataframe []byte) (float32, error) {
+func wattSec1(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws1: ")
 	return readAsFloat(dataframe, 5, 10, 1, true)
 }
 
 // watt seconds for ch2
-func wattSec2(dataframe []byte) (float32, error) {
+func wattSec2(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws2: ")
 	return readAsFloat(dataframe, 10, 15, 1, true)
 }
 
 // watt seconds for aux1
-func wattSec3(dataframe []byte) (float32, error) {
+func wattSec3(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws3: ")
 	return readAsFloat(dataframe, 40, 44, 1, true)
 }
 
 // watt seconds for aux2
-func wattSec4(dataframe []byte) (float32, error) {
+func wattSec4(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws4: ")
 	return readAsFloat(dataframe, 44, 48, 1, true)
 }
 
 // watt seconds for aux3
-func wattSec5(dataframe []byte) (float32, error) {
+func wattSec5(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws5: ")
 	return readAsFloat(dataframe, 48, 52, 1, true)
 }
 
 // watt seconds for aux4
-func wattSec6(dataframe []byte) (float32, error) {
+func wattSec6(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws6: ")
 	return readAsFloat(dataframe, 52, 56, 1, true)
 }
 
 // watt seconds for aux5
-func wattSec7(dataframe []byte) (float32, error) {
+func wattSec7(dataframe []byte) (float64, error) {
 	//fmt.Printf("ws7: ")
 	return readAsFloat(dataframe, 56, 60, 1, true)
 }
 
 // amperes for ch1
-func current1(dataframe []byte) (float32, error) {
+func current1(dataframe []byte) (float64, error) {
 	//fmt.Printf("c1: ")
 	return readAsFloat(dataframe, 34, 36, .01, true)
 }
 
 // amperes for ch2
-func current2(dataframe []byte) (float32, error) {
+func current2(dataframe []byte) (float64, error) {
 	//fmt.Printf("c2: ")
 	return readAsFloat(dataframe, 36, 38, .01, true)
 }
 
 // device clock seconds
-func deviceClock(dataframe []byte) (float32, error) {
+func deviceClock(dataframe []byte) (float64, error) {
 	//fmt.Printf("clock: ")
 	return readAsFloat(dataframe, 37, 40, 1, true)
 }
 
 // readAsFloat reads a byte slice of the dataframe dictated by start inclusive and end exclusive indices
-// as an unsigned integer, multiplies it by a multiplier and returns the result as a float32
+// as an unsigned integer, multiplies it by a multiplier and returns the result as a float64
 // Returns an error if the end index is out of bounds
-func readAsFloat(dataframe []byte, start, end int, multiplier float32, littleEndian bool) (float32, error) {
+func readAsFloat(dataframe []byte, start, end int, multiplier float64, littleEndian bool) (float64, error) {
 	//fmt.Printf("%v\n", dataframe[start:end])
 	if len(dataframe) <= end {
 		return 0.0, fmt.Errorf("dataframe (len=%d) is missing bytes %d - %d",
 			len(dataframe), start, end)
 	}
 	if littleEndian {
-		return float32(binary.LittleEndian.Uint64(padZeros(dataframe[start:end], littleEndian))) * multiplier, nil
+		return float64(binary.LittleEndian.Uint64(padZeros(dataframe[start:end], littleEndian))) * multiplier, nil
 	}
-	return float32(binary.BigEndian.Uint64(padZeros(dataframe[start:end], littleEndian))) * multiplier, nil
+	return float64(binary.BigEndian.Uint64(padZeros(dataframe[start:end], littleEndian))) * multiplier, nil
 }
 
 func padZeros(dataSlice []byte, littleEndian bool) []byte {

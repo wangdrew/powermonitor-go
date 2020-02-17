@@ -5,9 +5,9 @@ import "time"
 type PowerMetric struct {
 	SensorName string
 	Ts         time.Time
-	PowerW     float32
-	EnergyWs   float32
-	VoltageV   float32
+	PowerW     float64
+	EnergyWs   float64
+	VoltageV   float64
 }
 
 type PowerMetrics []PowerMetric

@@ -5,16 +5,18 @@ import (
 	"testing"
 )
 
+const delta = 1e-3 // used to assert floating-point "equality"
+
 func TestECM1240Source_Read(t *testing.T) {
 	s := ECM1240Source{Name: "power", Port: &fakeSerial{}}
 	wattSecParsers = map[string]parsers{"1": wattSec1}
 	metrics, err := s.Read()
 	assert.Nil(t, err)
 	assert.Len(t, metrics, 1)
-	assert.Equal(t, metrics[0].PowerW, float32(0.0))
-	assert.Equal(t, metrics[0].EnergyWs, float32(100.0))
-	assert.Equal(t, metrics[0].SensorName, "power_1")
-	assert.Equal(t, metrics[0].VoltageV, float32(120.3))
+	assert.InDelta(t, 0.0, metrics[0].PowerW, delta)
+	assert.InDelta(t, 100.0, metrics[0].EnergyWs, delta)
+	assert.Equal(t, "power_1", metrics[0].SensorName)
+	assert.InDelta(t, 120.3, metrics[0].VoltageV, delta)
 	assert.NotEmpty(t, metrics[0].Ts)
 
 	// 2nd metric
@@ -25,10 +27,10 @@ func TestECM1240Source_Read(t *testing.T) {
 	metrics, err = s.Read()
 	assert.Nil(t, err)
 	assert.Len(t, metrics, 1)
-	assert.Equal(t, metrics[0].PowerW, float32(100.0))   // (200-100) wattsec / 1 sec = 100 watts
-	assert.Equal(t, metrics[0].EnergyWs, float32(200.0)) // 200 wattsec
-	assert.Equal(t, metrics[0].SensorName, "power_1")
-	assert.Equal(t, metrics[0].VoltageV, float32(120.3))
+	assert.InDelta(t, 100.0, metrics[0].PowerW, delta)   // (200-100) wattsec / 1 sec = 100 watts
+	assert.InDelta(t, 200.0, metrics[0].EnergyWs, delta) // 200 wattsec
+	assert.Equal(t, "power_1", metrics[0].SensorName)
+	assert.InDelta(t, 120.3, metrics[0].VoltageV, delta)
 	assert.NotEmpty(t, metrics[0].Ts)
 }
 
@@ -52,23 +54,23 @@ func TestReadAsFloat(t *testing.T) {
 
 	val, err := readAsFloat(sampleDataFrame, 3, 5, 0.1, false)
 	assert.Nil(t, err)
-	assert.Equal(t, float32(120.3), val)
+	assert.InDelta(t, 120.3, val, delta)
 
 	val, err = readAsFloat(sampleDataFrame, 3, 5, 0.1, true)
 	assert.Nil(t, err)
-	assert.Equal(t, float32(4582.8003), val)
+	assert.InDelta(t, 4582.8003, val, delta)
 }
 
 func TestPadZeros(t *testing.T) {
-	assert.Equal(t, padZeros([]byte{}, false), []byte{0, 0, 0, 0, 0, 0, 0, 0})
-	assert.Equal(t, padZeros([]byte{1, 2, 3}, true), []byte{1, 2, 3, 0, 0, 0, 0, 0})
-	assert.Equal(t, padZeros([]byte{1, 2, 3}, false), []byte{0, 0, 0, 0, 0, 1, 2, 3})
+	assert.Equal(t, []byte{0, 0, 0, 0, 0, 0, 0, 0}, padZeros([]byte{}, false))
+	assert.Equal(t, []byte{1, 2, 3, 0, 0, 0, 0, 0}, padZeros([]byte{1, 2, 3}, true))
+	assert.Equal(t, []byte{0, 0, 0, 0, 0, 1, 2, 3}, padZeros([]byte{1, 2, 3}, false))
 }
 
 func TestVoltage(t *testing.T) {
 	val, err := voltage(sampleDataFrame)
 	assert.Nil(t, err)
-	assert.Equal(t, float32(120.3), val)
+	assert.InDelta(t, 120.3, val, delta)
 }
 
 var sampleDataFrame = []byte{
