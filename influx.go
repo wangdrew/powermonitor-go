@@ -33,6 +33,8 @@ func (me *InfluxOutput) Start(metrics chan models.PowerMetrics, stop chan struct
 		case m := <-metrics:
 			_, err := me.Client.Write(context.Background(), me.bucket, me.org, mapMetrics(m)...)
 			if err != nil {
+				fmt.Println(err)
+				// fixme does this work?
 				fmt.Errorf("%+v", err) // continue on error
 			}
 		}
