@@ -14,8 +14,8 @@ PWD = $(shell pwd)
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on $(GOBUILD) -o $(BINARY_NAME)
 
-.PHONY: arm6build
-arm6build:
+.PHONY: buildarm6
+buildarm6:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 GO111MODULE=on $(GOBUILD) -o $(BINARY_NAME)
 
 .PHONY: run
@@ -23,8 +23,8 @@ run:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on $(GOBUILD) -o $(BINARY_NAME)
 	./$(BINARY_NAME)
 
-.PHONY: arm6run
-arm6run:
+.PHONY: runarm6
+runarm6:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 GO111MODULE=on $(GOBUILD) -o $(BINARY_NAME)
 	./$(BINARY_NAME)
 
