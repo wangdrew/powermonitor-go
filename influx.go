@@ -7,10 +7,6 @@ import (
 	"log"
 )
 
-type Output interface {
-	Start(metrics chan models.PowerMetrics, stop chan struct{})
-}
-
 type InfluxOutput struct {
 	Client InfluxClient
 	bucket string

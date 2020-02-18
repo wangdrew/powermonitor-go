@@ -10,6 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
+	log.Println("starting power monitor")
 
 	var influxURL, influxToken, influxBucket, influxOrg, serialPath string
 	flag.StringVar(&influxURL, "influxUrl", "https://us-west-2-1.aws.cloud2.influxdata.com",
