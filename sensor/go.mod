@@ -3,6 +3,7 @@ module github.com/wangdrew/powermonitor-go/sensor
 go 1.13
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/influxdata/influxdb-client-go v0.1.5
 	github.com/influxdata/line-protocol v0.0.0-20190509173118-5712a8124a9a
 	github.com/stretchr/testify v1.4.0

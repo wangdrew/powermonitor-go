@@ -34,7 +34,8 @@ func TestInfluxOutput(t *testing.T) {
 
 func TestMapMetrics(t *testing.T) {
 	ts := time.Date(2000, 01, 01, 00, 00, 00, 00, time.UTC)
-	actual := mapMetrics(models.PowerMetrics{{
+	cl := InfluxOutput{}
+	actual := cl.mapMetrics(models.PowerMetrics{{
 		VoltageV:   120,
 		PowerW:     100,
 		EnergyWs:   200,
