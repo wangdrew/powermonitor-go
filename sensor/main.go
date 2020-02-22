@@ -25,10 +25,26 @@ func main() {
 	timer := NewTickerTimer(2000 * time.Millisecond) // poll ECM-1240 every 2 seconds
 	metrics := make(chan models.PowerMetrics, 100)   // metrics buffer decoupling source from output sink
 	stopOutput := make(chan struct{})
-	output, err := NewInflux(influxURL, influxToken, influxOrg, influxBucket)
+	metricStreams := Clone(metrics, 2)
+
+	// influx
+	influxOutput, err := NewInflux(influxURL, influxToken, influxOrg, influxBucket)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// mqtt
+	// fixme: parameterize main with these
+	mqttUrl := "tcp://192.168.69.95:1883"
+	mqttClientID := "foo"
+	mqttTopic := "test-topic"
+	mqttUser := ""
+	mqttPass := ""
+	mqttOutput, err := NewMqtt(mqttUrl, mqttClientID, mqttTopic, mqttUser, mqttPass)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	source := NewECM1240Source("power", serialPath)
 	if err := source.Init(); err != nil {
 		log.Fatal(err)
@@ -39,7 +55,11 @@ func main() {
 		close(stopOutput)
 	}()
 	go func() {
-		output.Start(metrics, stopOutput)
+		influxOutput.Start(metricStreams[0], stopOutput)
 	}()
+	go func() {
+		mqttOutput.Start(metricStreams[1], stopOutput)
+	}()
+
 	NewRunner(source, timer, metrics).Run()
 }

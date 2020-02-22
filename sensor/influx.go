@@ -29,7 +29,7 @@ func (me *InfluxOutput) Start(metrics chan models.PowerMetrics, stop chan struct
 		case m := <-metrics:
 			_, err := me.Client.Write(context.Background(), me.bucket, me.org, me.mapMetrics(m)...)
 			if err != nil {
-				log.Printf("error writting metric: %+v", err)
+				log.Printf("error writting metric to influx: %+v", err)
 			}
 		}
 	}

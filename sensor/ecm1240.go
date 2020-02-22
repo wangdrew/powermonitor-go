@@ -8,6 +8,7 @@ import (
 	"github.com/wangdrew/powermonitor-go/models"
 	"time"
 )
+
 func NewECM1240Source(deviceName, serialPath string) Source {
 	return &ECM1240Source{Name: deviceName, serialPath: serialPath}
 }

@@ -16,8 +16,8 @@ func TestMqttOutput(t *testing.T) {
 	stop := make(chan struct{})
 
 	go func() { output.Start(metrics, stop) }()
-	for i:=0; i<n; i++ {
-		metrics <- models.PowerMetrics{{},{}} // publish two measurements per metric
+	for i := 0; i < n; i++ {
+		metrics <- models.PowerMetrics{{}, {}} // publish two measurements per metric
 	}
 	time.Sleep(100 * time.Millisecond) // give output goroutine time to write to its client
 	assert.Equal(t, 10, cl.NumPublishCalled)
@@ -28,10 +28,10 @@ func TestMqttOutput(t *testing.T) {
 }
 
 type MockMqtt struct {
-	NumConnectCalled int
+	NumConnectCalled    int
 	NumDisconnectCalled int
-	NumPublishCalled int
-	PublishCalledWith []interface{}
+	NumPublishCalled    int
+	PublishCalledWith   []interface{}
 }
 
 func (me *MockMqtt) Connect() mqtt.Token {
