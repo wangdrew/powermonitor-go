@@ -36,10 +36,10 @@ func main() {
 	// mqtt
 	// fixme: parameterize main with these
 	mqttUrl := "tcp://192.168.69.95:1883"
-	mqttClientID := "foo"
 	mqttTopic := "test-topic"
 	mqttUser := ""
 	mqttPass := ""
+	mqttClientID := "foobar1"
 	mqttOutput, err := NewMqtt(mqttUrl, mqttClientID, mqttTopic, mqttUser, mqttPass)
 	if err != nil {
 		log.Fatal(err)
