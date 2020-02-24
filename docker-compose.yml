@@ -5,3 +5,13 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
+
+  powerserver:
+    build:
+      context: .
+      dockerfile: ./webserver/Dockerfile
+    container_name: powerserver
+    ports:
+      - 8100:8100
+    depends_on:
+      - mqtt
