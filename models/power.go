@@ -3,11 +3,11 @@ package models
 import "time"
 
 type PowerMetric struct {
-	SensorName string
-	Ts         time.Time
-	PowerW     float64
-	EnergyWs   float64
-	VoltageV   float64
+	SensorName string    `json:"sensorName"`
+	Ts         time.Time `json:"ts"`
+	PowerW     float64   `json:"powerW"`
+	EnergyWs   float64   `json:"energyWs"`
+	VoltageV   float64   `json:"voltageV"`
 }
 
 type PowerMetrics []PowerMetric
