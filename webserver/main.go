@@ -30,12 +30,13 @@ func main() {
 
 	msgHandler := func(cl mqtt.Client, msg mqtt.Message) {
 		var metric models.PowerMetric
-		if err := json.Unmarshal(msg.Payload(), &m); err != nil {
+		if err := json.Unmarshal(msg.Payload(), &metric); err != nil {
 			log.Printf("error deserializing MQTT message: %v", err)
 			return
 		}
 		if metric.SensorName == "" {
 			log.Printf("metric missing sensorname, payload: %s", string(msg.Payload()))
+			return
 		}
 		m.UpdatePower(metric.SensorName, metric)
 	}
