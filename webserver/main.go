@@ -15,6 +15,7 @@ import (
 func main() {
 	var port int
 	var mqttURL, mqttTopic, mqttPass, mqttUser string
+	// fixme: env vars can override these
 	flag.IntVar(&port, "port", 8081, "port to bind the webserver to")
 	flag.StringVar(&mqttURL, "mqttURL", "tcp://localhost:1883", "mqtt broker url")
 	flag.StringVar(&mqttTopic, "mqttTopic", "test-topic", "mqtt topic name")

@@ -13,6 +13,7 @@ func main() {
 	log.Println("starting power monitor")
 
 	var influxURL, influxToken, influxBucket, influxOrg, serialPath string
+	// fixme: env vars can override these
 	flag.StringVar(&influxURL, "influxUrl", "https://us-west-2-1.aws.cloud2.influxdata.com",
 		"influx cloud instance URL")
 	flag.StringVar(&influxToken, "influxToken", "", "influx cloud authorization token")
@@ -58,6 +59,7 @@ func main() {
 		influxOutput.Start(metricStreams[0], stopOutput)
 	}()
 	go func() {
+		// fixme: have this connect on publish rather than start
 		mqttOutput.Start(metricStreams[1], stopOutput)
 	}()
 
