@@ -3,16 +3,22 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"github.com/wangdrew/powermonitor-go/models"
 	"log"
+	"os"
 	"time"
 )
 
 func main() {
 	ctx := context.Background()
 	log.Println("starting power monitor")
+	h, err := os.Hostname()
+	fmt.Println(err)
+	fmt.Println(h)
 
 	var influxURL, influxToken, influxBucket, influxOrg, serialPath string
+	var mqttUrl, mqttTopic, mqttUser, mqttPass string
 	// fixme: env vars can override these
 	flag.StringVar(&influxURL, "influxUrl", "https://us-west-2-1.aws.cloud2.influxdata.com",
 		"influx cloud instance URL")
@@ -21,6 +27,10 @@ func main() {
 	flag.StringVar(&influxOrg, "influxOrg", "", "influx cloud organization name")
 	flag.StringVar(&serialPath, "serialPath", "/dev/ttyUSB0",
 		"serial device system filepath that the ECM1240 is connected to")
+	flag.StringVar(&mqttUrl, "mqttUrl", "", "MQTT URL hostname")
+	flag.StringVar(&mqttTopic, "mqttTopic", "", "MQTT broker topic")
+	flag.StringVar(&mqttUser, "mqttUser", "", "MQTT username")
+	flag.StringVar(&mqttPass, "mqttPass", "", "MQTT username")
 	flag.Parse()
 
 	timer := NewTickerTimer(2000 * time.Millisecond) // poll ECM-1240 every 2 seconds
@@ -35,13 +45,12 @@ func main() {
 	}
 
 	// mqtt
-	// fixme: parameterize main with these
-	mqttUrl := "tcp://192.168.69.95:1883"
-	mqttTopic := "test-topic"
-	mqttUser := ""
-	mqttPass := ""
+	//mqttUrl := "tcp://192.168.69.95:1883"
+	//mqttTopic := "test-topic"
+	//mqttUser := ""
+	//mqttPass := ""
 	mqttClientID := "foobar1"
-	mqttOutput, err := NewMqtt(mqttUrl, mqttClientID, mqttTopic, mqttUser, mqttPass)
+	mqttOutput := NewMqtt(mqttUrl, mqttClientID, mqttTopic, mqttUser, mqttPass)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,7 +68,6 @@ func main() {
 		influxOutput.Start(metricStreams[0], stopOutput)
 	}()
 	go func() {
-		// fixme: have this connect on publish rather than start
 		mqttOutput.Start(metricStreams[1], stopOutput)
 	}()
 

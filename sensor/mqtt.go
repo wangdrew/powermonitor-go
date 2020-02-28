@@ -28,6 +28,11 @@ func (me *MqttOutput) Start(metrics chan models.PowerMetrics, stop chan struct{}
 			me.Client.Disconnect(250) // wait 250ms for existing work to be completed
 			return
 		case m := <-metrics:
+			if me.connectionToken == nil {
+				if err := me.Connect(); err != nil {
+					log.Printf("error connecting to mqtt: %v", err)
+				}
+			}
 			for _, dp := range m {
 				msg, err := me.mapMetrics(dp)
 				if err != nil {
@@ -43,26 +48,27 @@ func (me *MqttOutput) Start(metrics chan models.PowerMetrics, stop chan struct{}
 	}
 }
 
-func NewMqtt(url, clientID, topic, username, password string) (*MqttOutput, error) {
-	cl := mqtt.NewClient(
-		mqtt.NewClientOptions().
-			AddBroker(url).
-			SetClientID(clientID).
-			SetUsername(username).
-			SetPassword(password))
-
-	token := cl.Connect()
+func (me *MqttOutput) Connect() error {
+	token := me.Client.Connect()
 	if token.Wait() && token.Error() != nil {
-		return nil, token.Error()
+		return token.Error()
 	}
+	me.connectionToken = token
+	return nil
+}
 
+func NewMqtt(url, clientID, topic, username, password string) *MqttOutput {
 	return &MqttOutput{
-		Client:          cl,
-		topic:           topic,
-		connectionToken: token,
-		retained:        false, // todo: maybe this should be configurable?
-		qos:             0,
-	}, nil
+		Client: mqtt.NewClient(
+			mqtt.NewClientOptions().
+				AddBroker(url).
+				SetClientID(clientID).
+				SetUsername(username).
+				SetPassword(password)),
+		topic:    topic,
+		retained: false, // todo: maybe this should be configurable?
+		qos:      0,
+	}
 }
 
 // mapMetrics serializes into JSON

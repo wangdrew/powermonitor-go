@@ -20,6 +20,7 @@ func TestMqttOutput(t *testing.T) {
 		metrics <- models.PowerMetrics{{}, {}} // publish two measurements per metric
 	}
 	time.Sleep(100 * time.Millisecond) // give output goroutine time to write to its client
+	assert.Equal(t, 1, cl.NumConnectCalled)
 	assert.Equal(t, 10, cl.NumPublishCalled)
 	assert.Len(t, cl.PublishCalledWith, 10)
 	close(stop)
