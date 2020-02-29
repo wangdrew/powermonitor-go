@@ -1,0 +1,33 @@
+version: "3"
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    ports:
+      - 1883:1883
+      - 9001:9001
+  powersensor:
+    build:
+      context: ./sensor
+      args:
+        - arch=arm6
+      dockerfile: ./Dockerfile
+    image: powersensor
+    container_name: powersensor
+    devices:
+    - "/dev/ttyUSB0:/dev/ttyUSB0"
+    depends_on:
+      - mqtt
+    command: ["./sensor"]
+  powerserver:
+    build:
+      context: ./webserver
+      args:
+        - arch=arm6
+      dockerfile: ./Dockerfile
+    image: powerserver
+    container_name: powerserver
+    ports:
+      - 8081:8081
+    depends_on:
+      - mqtt
+    command: ["./powerserver"]

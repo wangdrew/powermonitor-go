@@ -61,9 +61,6 @@ func main() {
 		h, _ := os.Hostname()
 		mqttClientID := fmt.Sprintf("powersensor-%s", h)
 		mqttOutput := NewMqtt(c.MqttURL, mqttClientID, c.MqttTopic, c.MqttUser, c.MqttPass)
-		if err != nil {
-			log.Fatal(err)
-		}
 		go func() {
 			mqttOutput.Start(metricStreams[1], stopOutput)
 		}()

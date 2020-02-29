@@ -6,7 +6,7 @@ GOFMT = $(GOCMD) fmt
 ifndef ($(GOPATH))
 	GOPATH = $(HOME)/go
 endif
-BINARY_NAME = powermonitor
+BINARY_NAME = sensor
 PWD = $(shell pwd)
 
 

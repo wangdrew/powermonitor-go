@@ -1,4 +1,4 @@
 .idea/
-sensor/powermonitor
+sensor/sensor
 sensor/local-sync.sh
 webserver/powerserver
