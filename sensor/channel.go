@@ -15,7 +15,12 @@ func Clone(in chan models.PowerMetrics, numCopies int) []chan models.PowerMetric
 		for {
 			msg := <-in
 			for _, c := range out {
-				c <- msg
+				select {
+				case c <- msg:
+				default:
+					// Continue on to other channels if this channel is full
+					continue
+				}
 			}
 		}
 	}()

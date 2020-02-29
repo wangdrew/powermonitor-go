@@ -43,7 +43,7 @@ func TestRunner_Run(t *testing.T) {
 	for i := 0; i < n; i++ {
 		timer.Trig <- time.Now()
 	}
-	time.Sleep(100 * time.Millisecond) // allow Runner time to run before closing the channel
+	time.Sleep(50 * time.Millisecond) // allow Runner time to run before closing the channel
 	close(output)
 
 	assert.Equal(t, 10, source.NumReadCalls)
@@ -58,12 +58,13 @@ func TestRunner_ChannelFull(t *testing.T) {
 	go func() { r.Run() }()
 
 	timer.Trig <- time.Now()
-	assert.Len(t, output, 1) // output channel should still be full
+	time.Sleep(50 * time.Millisecond) // allow Runner time to run
+	assert.Len(t, output, 1)          // output channel should still be full
 	<-output
 	assert.Len(t, output, 0) // output channel should be clear
 	timer.Trig <- time.Now()
-	time.Sleep(100 * time.Millisecond) // allow Runner time to run
-	assert.Len(t, output, 1)           // runner should persist new metric
+	time.Sleep(50 * time.Millisecond) // allow Runner time to run
+	assert.Len(t, output, 1)          // runner should persist new metric
 	close(timer.Stop())
 }
 
@@ -73,7 +74,7 @@ func TestRunner_NoMetricsFromSource(t *testing.T) {
 	source.ReturnArgs[0] = models.PowerMetrics{} // source mock will return empty metrics
 
 	timer.Trig <- time.Now()
-	time.Sleep(100 * time.Millisecond)      // allow Runner time to run
+	time.Sleep(50 * time.Millisecond)       // allow Runner time to run
 	assert.Equal(t, source.NumReadCalls, 1) // source.Read should be called
 	assert.Len(t, output, 0)                // output channel should be empty
 }
