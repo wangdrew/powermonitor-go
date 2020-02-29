@@ -1,5 +1,7 @@
 github.com/eclipse/paho.mqtt.golang v1.2.0 h1:1F8mhG9+aO5/xpdtFkW4SxOJB67ukuDC3t2y2qayIX0=
 github.com/eclipse/paho.mqtt.golang v1.2.0/go.mod h1:H9keYFcgq3Qr5OUJm/JZI/i6U7joQ8SYLhZwfeOo6Ts=
+github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
+github.com/kelseyhightower/envconfig v1.4.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=
 github.com/wangdrew/powermonitor-go/models v0.0.0-20200222220753-100fb5b6f7ae h1:sZN2KqoOCC4IvL7B0GoYsRiBJijhxUolEtnwAUxXRH0=
 github.com/wangdrew/powermonitor-go/models v0.0.0-20200222220753-100fb5b6f7ae/go.mod h1:MbDkade/Gv19LaHkabkjCqDN34OOJJbyS59qy+H63G8=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

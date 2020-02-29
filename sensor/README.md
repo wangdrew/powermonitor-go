@@ -37,20 +37,32 @@ Running tests:
 make test
 ```
 
-
 ### Running
-By default, the binary will be named `powermonitor`. It accepts input parameters in the form of command line arguments:
+By default, the binary will be named `powermonitor`. It accepts input parameters in the form of environment variables: 
+* `SERIALPATH` - serial device system filepath
+* `ENABLEINFLUX` - write measurements to Influx Cloud
+* `ENABLEMQTT` - write measurements to MQTT
+* `INFLUXURL` - influx cloud URL
+* `INFLUXTOKEN` - influx authentication token
+* `INFLUXBUCKET` - influx metrics bucket
+* `INFLUXORG` - influx org
+* `MQTTURL` - MQTT broker URL e.g. "tcp://mqtt-hostname:1883"
+* `MQTTTOPIC` - MQTT topic to publish to
+* `MQTTUSER` - MQTT user
+* `MQTTPASS` - MQTT password
+
+Example usage:
 ```shell
-powermonitor 
-   -serialPath=<serial device system filepath> 
-   -influxOrg=<influx cloud org name>
-   -influxBucket=<influx bucket name>
-   -influxToken=<influx cloud auth token>
-   -influxUrl=<influx cloud URL>
-
-Example Usage:
-powermonitor -serialPath=/dev/ttyUSB0 -influxBucket=power -influxOrg="wang.andrew11@gmail.com" -influxToken=foobar -influxUrl=https://us-west-2-1.aws.cloud2.influxdata.com
-
+export ENABLEINFLUX=true
+export ENABLEMQTT=true
+export SERIALPATH=/dev/ttyUSB0
+export INFLUXBUCKET=power
+export INFLUXORG="wang.andrew11@gmail.com"
+export INFLUXTOKEN=foobar
+export INFLUXURL=https://us-west-2-1.aws.cloud2.influxdata.com
+export MQTTURL=tcp://mqtt:1883
+export MQTTTOPIC=power
+./powermonitor 
 ```
 Logs - mostly just errors - are printed to `stderr`
 

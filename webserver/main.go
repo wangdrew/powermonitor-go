@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/wangdrew/powermonitor-go/models"
 	"log"
 	"net/http"
@@ -12,20 +12,24 @@ import (
 	"sync"
 )
 
-func main() {
-	var port int
-	var mqttURL, mqttTopic, mqttPass, mqttUser string
-	// fixme: env vars can override these
-	flag.IntVar(&port, "port", 8081, "port to bind the webserver to")
-	flag.StringVar(&mqttURL, "mqttURL", "tcp://localhost:1883", "mqtt broker url")
-	flag.StringVar(&mqttTopic, "mqttTopic", "test-topic", "mqtt topic name")
-	flag.StringVar(&mqttUser, "mqttUsername", "", "mqtt username")
-	flag.StringVar(&mqttPass, "mqttPassword", "", "mqtt password")
-	flag.Parse()
+type Config struct {
+	Port      int    `default:"8081"`
+	MqttURL   string `default:"tcp://mqtt:1883"`
+	MqttTopic string `default:"power"`
+	MqttUser  string `default:""`
+	MqttPass  string `default:""`
+}
 
-	opts := mqtt.NewClientOptions().AddBroker(mqttURL).SetClientID("power-subscriber") // todo
-	c := mqtt.NewClient(opts)
-	if token := c.Connect(); token.Wait() && token.Error() != nil {
+func main() {
+	var c = Config{}
+	if err := envconfig.Process("", &c); err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("configuration: %+v\n", c)
+
+	opts := mqtt.NewClientOptions().AddBroker(c.MqttURL).SetClientID("power-subscriber") // todo
+	cl := mqtt.NewClient(opts)
+	if token := cl.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error()) // fixme
 	}
 
@@ -42,14 +46,14 @@ func main() {
 		m.UpdatePower(metric.SensorName, metric)
 	}
 
-	if token := c.Subscribe(mqttTopic, 0, msgHandler); token.Wait() && token.Error() != nil {
+	if token := cl.Subscribe(c.MqttTopic, 0, msgHandler); token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
 		os.Exit(1) //fixme
 	}
 
 	http.HandleFunc("/metrics", getMetrics)
-	fmt.Printf("starting server on :%d\n", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	fmt.Printf("starting power server on :%d\n", c.Port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", c.Port), nil))
 }
 
 // In-memory metrics store
